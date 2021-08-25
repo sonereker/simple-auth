@@ -22,6 +22,9 @@ func NewDBConnection() (*gorm.DB, error) {
 
 func prepareConnectionParams() (string, error) {
 	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
+	if err != nil {
+		return "", err
+	}
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=%s port=%d",
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_USERNAME"),
@@ -30,5 +33,5 @@ func prepareConnectionParams() (string, error) {
 		os.Getenv("DB_SSL_MODE"),
 		port,
 	)
-	return dsn, err
+	return dsn, nil
 }
