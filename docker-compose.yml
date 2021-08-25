@@ -9,15 +9,20 @@ services:
     depends_on:
       - db
     environment:
+      - DB_HOST=db
       - DB_NAME=simple_auth
       - DB_USERNAME=local
       - DB_PASSWORD=local
       - DB_PORT=5432
+      - DB_SSL_MODE=disable
 
   db:
     image: 'postgres:13.1-alpine'
     container_name: db
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_USER=local
       - POSTGRES_PASSWORD=local
       - POSTGRES_DB=simple_auth
+      - LC_ALL= C.UTF-8

@@ -1,4 +1,4 @@
-package internal
+package common
 
 import (
 	"fmt"
@@ -22,11 +22,12 @@ func NewDBConnection() (*gorm.DB, error) {
 
 func prepareConnectionParams() (error, string) {
 	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=false",
-		"localhost",
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=%s port=%d",
+		os.Getenv("DB_HOST"),
 		os.Getenv("DB_USERNAME"),
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_NAME"),
+		os.Getenv("DB_SSL_MODE"),
 		port,
 	)
 	return err, dsn

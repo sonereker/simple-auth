@@ -13,7 +13,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o auth main.go
+RUN go build -o auth cmd/server/main.go
 
 WORKDIR /app
 
