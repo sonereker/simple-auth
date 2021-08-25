@@ -1,7 +1,7 @@
 package users
 
 import (
-	"github.com/sonereker/simple-auth/grpc/v1"
+	"github.com/sonereker/simple-auth/pb/v1"
 	"gorm.io/gorm"
 )
 
@@ -13,8 +13,8 @@ type UserDBModel struct {
 }
 
 //AsResponse returns a simplified DTO object for the given UserDBModel
-func (u *UserDBModel) AsResponse() *grpc.UserResponse {
-	return &grpc.UserResponse{
+func (u *UserDBModel) AsResponse() *pb.UserResponse {
+	return &pb.UserResponse{
 		Email: u.Email,
 	}
 }

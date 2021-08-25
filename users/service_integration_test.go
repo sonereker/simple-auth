@@ -3,15 +3,15 @@ package users
 import (
 	"context"
 	"fmt"
-	"github.com/sonereker/simple-auth/grpc/v1"
-	ggrpc "google.golang.org/grpc"
+	"github.com/sonereker/simple-auth/pb/v1"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"os"
 	"testing"
 )
 
-var client grpc.UsersClient
+var client pb.UsersClient
 
 func TestMain(m *testing.M) {
 	setup()
@@ -20,13 +20,13 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
-	conn, _ := ggrpc.Dial("localhost:8070", ggrpc.WithInsecure())
-	client = grpc.NewUsersClient(conn)
+	conn, _ := grpc.Dial("localhost:8070", grpc.WithInsecure())
+	client = pb.NewUsersClient(conn)
 }
 
 func TestRegisterWOAuthorizationCode(t *testing.T) {
 	fmt.Println("Registering a new user")
-	newUser := grpc.RegistrationRequest{
+	newUser := pb.RegistrationRequest{
 		Email:    "dummy@email.com",
 		Password: "hello123",
 	}
@@ -42,7 +42,7 @@ func TestRegisterWOAuthorizationCode(t *testing.T) {
 
 func TestRegisterWAuthorizationCode(t *testing.T) {
 	fmt.Println("Registering a new user")
-	newUser := grpc.RegistrationRequest{
+	newUser := pb.RegistrationRequest{
 		Email:    "dummy@email.com",
 		Password: "hello123",
 	}

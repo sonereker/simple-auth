@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
-	"github.com/sonereker/simple-auth/common"
-	"github.com/sonereker/simple-auth/grpc/v1"
+	"github.com/sonereker/simple-auth/internal"
+	"github.com/sonereker/simple-auth/pb/v1"
 	"github.com/sonereker/simple-auth/users"
-	ggrpc "google.golang.org/grpc"
+	"google.golang.org/grpc"
 	"log"
 	"net/http"
 	"os"
@@ -29,7 +29,7 @@ func main() {
 }
 
 func run() error {
-	db, err := common.NewDBConnection()
+	db, err := internal.NewDBConnection()
 	if err != nil {
 		return errors.Wrap(err, "Init Database")
 	}
@@ -51,15 +51,15 @@ func startHTTPServer() error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	conn, err := ggrpc.Dial(*grpcServerEndpoint, ggrpc.WithInsecure())
+	conn, err := grpc.Dial(*grpcServerEndpoint, grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
 
 	mux := runtime.NewServeMux()
-	opts := []ggrpc.DialOption{ggrpc.WithInsecure()}
-	err = grpc.RegisterUsersHandlerFromEndpoint(ctx, mux, *grpcServerEndpoint, opts)
+	opts := []grpc.DialOption{grpc.WithInsecure()}
+	err = pb.RegisterUsersHandlerFromEndpoint(ctx, mux, *grpcServerEndpoint, opts)
 	if err != nil {
 		return err
 	}

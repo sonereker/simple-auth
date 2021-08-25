@@ -1,4 +1,4 @@
-package users
+package auth
 
 import (
 	"context"
@@ -10,11 +10,11 @@ import (
 )
 
 type authInterceptor struct {
-	authManager   *authManager
+	authManager   *AuthManager
 	publicMethods map[string]bool
 }
 
-func NewAuthInterceptor(am *authManager, publicMethods map[string]bool) *authInterceptor {
+func NewAuthInterceptor(am *AuthManager, publicMethods map[string]bool) *authInterceptor {
 	return &authInterceptor{
 		authManager:   am,
 		publicMethods: publicMethods,

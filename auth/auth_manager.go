@@ -1,4 +1,4 @@
-package users
+package auth
 
 import (
 	"fmt"
@@ -7,13 +7,13 @@ import (
 	"log"
 )
 
-type authManager struct {
-	tokenSecret string
+type AuthManager struct {
+	TokenSecret string
 }
 
-func NewAuthManager(tokenSecret string) *authManager {
-	return &authManager{
-		tokenSecret: tokenSecret,
+func NewAuthManager(tokenSecret string) *AuthManager {
+	return &AuthManager{
+		TokenSecret: tokenSecret,
 	}
 }
 
@@ -23,7 +23,7 @@ type UserClaims struct {
 	Email  string
 }
 
-func (am *authManager) verifyToken(accessToken string) (*UserClaims, error) {
+func (am *AuthManager) verifyToken(accessToken string) (*UserClaims, error) {
 	token, err := jwt.ParseWithClaims(
 		accessToken,
 		&UserClaims{},
@@ -33,7 +33,7 @@ func (am *authManager) verifyToken(accessToken string) (*UserClaims, error) {
 				return nil, fmt.Errorf("unexpected token signing method")
 			}
 
-			return []byte(am.tokenSecret), nil
+			return []byte(am.TokenSecret), nil
 		},
 	)
 	if err != nil {
@@ -51,7 +51,7 @@ func (am *authManager) verifyToken(accessToken string) (*UserClaims, error) {
 	}
 }
 
-func hashAndSalt(password string) string {
+func HashAndSalt(password string) string {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Println(err)
@@ -59,7 +59,7 @@ func hashAndSalt(password string) string {
 	return string(hash)
 }
 
-func comparePasswords(hashedPassword string, plainPassword []byte) bool {
+func ComparePasswords(hashedPassword string, plainPassword []byte) bool {
 	byteHash := []byte(hashedPassword)
 	err := bcrypt.CompareHashAndPassword(byteHash, plainPassword)
 	if err != nil {

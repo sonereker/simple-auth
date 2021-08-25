@@ -4,10 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/sonereker/simple-auth/common"
-	"github.com/sonereker/simple-auth/grpc/v1"
+	"github.com/sonereker/simple-auth/auth"
+	"github.com/sonereker/simple-auth/internal"
+	"github.com/sonereker/simple-auth/pb/v1"
 	"github.com/sonereker/simple-auth/users"
-	ggrpc "google.golang.org/grpc"
+	"google.golang.org/grpc"
 	"gorm.io/gorm"
 	"log"
 	"net"
@@ -28,7 +29,7 @@ func main() {
 }
 
 func run() error {
-	db, err := common.NewDBConnection()
+	db, err := internal.NewDBConnection()
 	if err != nil {
 		return errors.Wrap(err, "Init Database")
 	}
@@ -52,16 +53,16 @@ func startGRPCServer(db *gorm.DB) error {
 		log.Fatal(err)
 	}
 
-	authManager := users.NewAuthManager(*tokenSecret)
-	authInterceptor := users.NewAuthInterceptor(authManager, publicMethods())
-	serverOptions := []ggrpc.ServerOption{
-		ggrpc.UnaryInterceptor(authInterceptor.Unary()),
+	authManager := auth.NewAuthManager(*tokenSecret)
+	authInterceptor := auth.NewAuthInterceptor(authManager, publicMethods())
+	serverOptions := []grpc.ServerOption{
+		grpc.UnaryInterceptor(authInterceptor.Unary()),
 	}
 
-	gs := ggrpc.NewServer(serverOptions...)
+	gs := grpc.NewServer(serverOptions...)
 
 	usersService := users.NewUserService(db, authManager)
-	grpc.RegisterUsersServer(gs, usersService)
+	pb.RegisterUsersServer(gs, usersService)
 
 	log.Println("Running GRPC Server at " + *grpcServerEndpoint)
 	if err := gs.Serve(lis); err != nil {
