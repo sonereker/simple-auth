@@ -10,7 +10,7 @@ import (
 
 //NewDBConnection establishes a new DB connection
 func NewDBConnection() (*gorm.DB, error) {
-	err, dsn := prepareConnectionParams()
+	dsn, err := prepareConnectionParams()
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -20,7 +20,7 @@ func NewDBConnection() (*gorm.DB, error) {
 	return db, nil
 }
 
-func prepareConnectionParams() (error, string) {
+func prepareConnectionParams() (string, error) {
 	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=%s port=%d",
 		os.Getenv("DB_HOST"),
@@ -30,5 +30,5 @@ func prepareConnectionParams() (error, string) {
 		os.Getenv("DB_SSL_MODE"),
 		port,
 	)
-	return err, dsn
+	return dsn, err
 }
