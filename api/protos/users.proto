@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package users;
+
+option go_package = "github.com/sonereker/simple-auth/api/protos";
+
+service UsersService {
+  rpc RegisterUser(UserRequest) returns (AuthenticationResponse) {}
+  rpc GetCurrentUser(EmptyParams) returns (UserResponse) {}
+}
+
+message EmptyParams {}
+
+message UserRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message UserResponse {
+  string email = 1;
+}
+
+message AuthenticationResponse {
+  string token = 1;
+  string refreshToken = 2;
+  UserResponse user = 3;
+}
+
+message EmptyResponse {}

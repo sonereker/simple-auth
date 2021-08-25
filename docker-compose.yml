@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    container_name: api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - DB_NAME=simple_auth
+      - DB_USERNAME=local
+      - DB_PASSWORD=local
+      - DB_PORT=5432
+
+  db:
+    image: 'postgres:13.1-alpine'
+    container_name: db
+    environment:
+      - POSTGRES_USER=local
+      - POSTGRES_PASSWORD=local
+      - POSTGRES_DB=simple_auth
