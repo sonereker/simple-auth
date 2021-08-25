@@ -8,9 +8,8 @@ import (
 //UserDBModel is the DB model for User
 type UserDBModel struct {
 	gorm.Model
-	Email        string `gorm:"index not null"`
-	Password     string `gorm:"not null"`
-	PasswordHash string `gorm:"not null"`
+	Email    string `gorm:"index not null"`
+	Password string `gorm:"not null"`
 }
 
 //AsResponse returns a simplified DTO object for the given UserDBModel

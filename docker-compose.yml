@@ -1,9 +1,28 @@
 version: '3'
 
 services:
-  app:
-    build: .
-    container_name: api
+  grpc_server:
+    build:
+      context: .
+      dockerfile: docker/grpc-server/Dockerfile
+    container_name: grpc_server
+    ports:
+      - "8070:8070"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_NAME=simple_auth
+      - DB_USERNAME=local
+      - DB_PASSWORD=local
+      - DB_PORT=5432
+      - DB_SSL_MODE=disable
+
+  http_server:
+    build:
+      context: .
+      dockerfile: ./docker/http-server/Dockerfile
+    container_name: http_server
     ports:
       - "8080:8080"
     depends_on:

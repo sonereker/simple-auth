@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
@@ -9,14 +10,18 @@ import (
 	"github.com/sonereker/simple-auth/grpc/v1"
 	"github.com/sonereker/simple-auth/users"
 	ggrpc "google.golang.org/grpc"
-	"gorm.io/gorm"
 	"log"
-	"net"
 	"net/http"
 	"os"
 )
 
+var (
+	grpcServerEndpoint = flag.String("grpc-server-endpoint", "localhost:8070", "gRPC server endpoint")
+	httpServerEndpoint = flag.String("http-server-endpoint", "localhost:8080", "HTTP server endpoint")
+)
+
 func main() {
+	flag.Parse()
 	if err := run(); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%s/n", err)
 		os.Exit(1)
@@ -34,56 +39,33 @@ func run() error {
 		return errors.Wrap(err, "Run Migrations")
 	}
 
-	err = runGRPCServer(db)
+	err = startHTTPServer()
 	if err != nil {
-		return errors.Wrap(err, "Run gRPC Server")
-	}
-
-	err = runHTTPServer()
-	if err != nil {
-		return errors.Wrap(err, "Run HTTP Server")
+		return errors.Wrap(err, "Start HTTP Server")
 	}
 	return nil
 }
 
-func runGRPCServer(db *gorm.DB) error {
-	nl, err := net.Listen("tcp", fmt.Sprintf(":%d", 9090))
-	if err != nil {
-		return err
-	}
-
-	grpcServer := ggrpc.NewServer()
-
-	usersService := users.NewUsersService(db)
-	grpc.RegisterUsersServer(grpcServer, usersService)
-
-	fmt.Println("Starting GRPC Server")
-	if err := grpcServer.Serve(nl); err != nil {
-		return err
-	}
-	return nil
-}
-
-func runHTTPServer() error {
+func startHTTPServer() error {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	conn, err := ggrpc.Dial("localhost:9090", ggrpc.WithInsecure())
+	conn, err := ggrpc.Dial(*grpcServerEndpoint, ggrpc.WithInsecure())
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
 
-	rmux := runtime.NewServeMux()
-	client := grpc.NewUsersClient(conn)
-	err = grpc.RegisterUsersHandlerClient(ctx, rmux, client)
+	mux := runtime.NewServeMux()
+	opts := []ggrpc.DialOption{ggrpc.WithInsecure()}
+	err = grpc.RegisterUsersHandlerFromEndpoint(ctx, mux, *grpcServerEndpoint, opts)
 	if err != nil {
 		return err
 	}
 
-	log.Println("Starting REST Server")
-	err = http.ListenAndServe("localhost:8080", rmux)
+	log.Println("Running HTTP Server at " + *httpServerEndpoint)
+	err = http.ListenAndServe(*httpServerEndpoint, mux)
 	if err != nil {
 		return err
 	}

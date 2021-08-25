@@ -29,7 +29,7 @@ generate: install-tools
 		--go_opt=paths=source_relative \
 		--go-grpc_out=grpc \
 		--go-grpc_opt=paths=source_relative \
-		--grpc-gateway_out=logtostderr=true:grpc \
+		--grpc-gateway_out=grpc \
 		--grpc-gateway_opt=paths=source_relative \
 		proto/v1/*.proto
 

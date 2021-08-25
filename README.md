@@ -23,6 +23,12 @@ Generate gRPC and REST bindings;
 make generate
 ```
 
+Environment variables required;
+
+```
+DB_HOST=localhost;DB_NAME=simple_auth;DB_USERNAME=local;DB_PASSWORD=local;DB_PORT=5432;DB_SSL_MODE=disable
+```
+
 ## Using Client
 
 Client will register a new user, which will also login user.

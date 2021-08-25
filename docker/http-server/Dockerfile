@@ -7,18 +7,18 @@ ENV GO111MODULE=on \
 
 WORKDIR /build
 
-COPY go.mod .
-COPY go.sum .
+COPY /go.mod .
+COPY /go.sum .
 RUN go mod download
 
-COPY . .
+COPY ../.. .
 
-RUN go build -o auth cmd/server/main.go
+RUN go build -o http_server cmd/http-server/main.go
 
 WORKDIR /app
 
-RUN cp /build/auth .
+RUN cp /build/http_server .
 
 EXPOSE 8080
 
-CMD ["/app/auth"]
+CMD ["/app/http_server"]
