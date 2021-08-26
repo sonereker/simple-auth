@@ -121,7 +121,7 @@ func TestGetCurrentUser(t *testing.T) {
 	conn, uc := client.NewUserClientWithConnection(grpcServerAddr, true, &pb.LoginRequest{Email: seedUserEmail, Password: dummyPassword})
 	defer conn.Close()
 
-	current, err := uc.GetCurrent(context.Background(), &pb.EmptyParams{})
+	current, err := uc.GetCurrent(context.Background(), &pb.Empty{})
 	if err != nil {
 		t.Error(err)
 		t.FailNow()

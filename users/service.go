@@ -15,10 +15,12 @@ type userService struct {
 	DB          *gorm.DB
 }
 
+//NewUserService creates a new userService with provided params
 func NewUserService(db *gorm.DB, am *auth.AuthManager) *userService {
 	return &userService{DB: db, authManager: am}
 }
 
+//Register creates the new user and returns a token with created user info
 func (service *userService) Register(ctx context.Context, rr *pb.RegistrationRequest) (*pb.AuthenticationResponse, error) {
 	var user UserDBModel
 	result := service.DB.Take(&user, "email = ?", rr.Email)
@@ -47,6 +49,7 @@ func (service *userService) Register(ctx context.Context, rr *pb.RegistrationReq
 	return authenticationResponse, nil
 }
 
+//Login returns a JWT token if a user exists with given credentials
 func (service *userService) Login(_ context.Context, lr *pb.LoginRequest) (*pb.AuthenticationResponse, error) {
 	var user UserDBModel
 	result := service.DB.Take(&user, "email = ?", lr.Email)
@@ -69,6 +72,7 @@ func (service *userService) Login(_ context.Context, lr *pb.LoginRequest) (*pb.A
 	}, nil
 }
 
+//GetCurrent returns current user with the token
 func (service *userService) GetCurrent(ctx context.Context, _ *pb.Empty) (*pb.UserResponse, error) {
 	id := ctx.Value("id")
 	var user UserDBModel

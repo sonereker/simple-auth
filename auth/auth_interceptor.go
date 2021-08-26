@@ -13,6 +13,7 @@ type authInterceptor struct {
 	publicMethods map[string]bool
 }
 
+//NewAuthInterceptor creates a new NewAuthInterceptor instance
 func NewAuthInterceptor(am *AuthManager, publicMethods map[string]bool) *authInterceptor {
 	return &authInterceptor{
 		authManager:   am,
@@ -20,6 +21,7 @@ func NewAuthInterceptor(am *AuthManager, publicMethods map[string]bool) *authInt
 	}
 }
 
+//Unary creates a new UnaryServerInterceptor
 func (interceptor *authInterceptor) Unary() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		ctx, err := interceptor.authorize(ctx, info.FullMethod)

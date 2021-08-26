@@ -7,21 +7,25 @@ import (
 	"time"
 )
 
+//AuthManager is the manager struct
 type AuthManager struct {
 	TokenSecret string
 }
 
+//NewAuthManager creates a new AuthManager
 func NewAuthManager(tokenSecret string) *AuthManager {
 	return &AuthManager{
 		TokenSecret: tokenSecret,
 	}
 }
 
+//UserClaims JWT custom claims struct
 type UserClaims struct {
 	jwt.StandardClaims
 	ID uint
 }
 
+//GenerateToken generates a new JWT token
 func (manager *AuthManager) GenerateToken(userID uint) (string, error) {
 	expirationTime := time.Now().Add(10 * time.Minute)
 	claims := &UserClaims{
@@ -38,6 +42,7 @@ func (manager *AuthManager) GenerateToken(userID uint) (string, error) {
 	return tokenString, nil
 }
 
+//VerifyToken verifies given token
 func (manager *AuthManager) VerifyToken(accessToken string) (*UserClaims, error) {
 	token, err := jwt.ParseWithClaims(
 		accessToken,
@@ -66,6 +71,7 @@ func (manager *AuthManager) VerifyToken(accessToken string) (*UserClaims, error)
 	}
 }
 
+//Hash generates hash for the given password
 func Hash(password string) (string, error) {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -74,6 +80,7 @@ func Hash(password string) (string, error) {
 	return string(hashed), nil
 }
 
+//IsCorrectPassword compares given hashed password with the plain password
 func IsCorrectPassword(hashedPassword string, plainPassword string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword))
 	return err == nil

@@ -8,10 +8,10 @@ import (
 )
 
 //NewUserClientWithConnection dials a connection to gRPC server and initializes a new UserClient using the connection
-func NewUserClientWithConnection(grpcServerAddr string, attachToken bool, loginRequest *pb.LoginRequest) (*grpc.ClientConn, pb.UserClient) {
-	var uc pb.UserClient
+func NewUserClientWithConnection(grpcServerAddr string, attachToken bool, loginRequest *pb.LoginRequest) (*grpc.ClientConn, pb.UserServiceClient) {
+	var uc pb.UserServiceClient
 	conn, _ := grpc.Dial(grpcServerAddr, grpc.WithInsecure())
-	uc = pb.NewUserClient(conn)
+	uc = pb.NewUserServiceClient(conn)
 
 	if attachToken {
 		login, err := uc.Login(context.Background(), loginRequest)
@@ -27,7 +27,7 @@ func NewUserClientWithConnection(grpcServerAddr string, attachToken bool, loginR
 			grpc.WithInsecure(),
 			grpc.WithUnaryInterceptor(interceptor.GetUnaryInterceptor()),
 		)
-		uc = pb.NewUserClient(conn)
+		uc = pb.NewUserServiceClient(conn)
 	}
 	return conn, uc
 }

@@ -16,6 +16,11 @@ docker-compose build
 docker-compose up
 ```
 
+## REST API Documentation
+
+Swagger UI is available (see `Quick Run`) at http://localhost:8080/swagger-ui/
+
+
 ## Development
 
 Install required tools;

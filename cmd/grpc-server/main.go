@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/sonereker/simple-auth/auth"
-	"github.com/sonereker/simple-auth/internal"
+	"github.com/sonereker/simple-auth/db"
 	"github.com/sonereker/simple-auth/pb/v1"
 	"github.com/sonereker/simple-auth/users"
 	"google.golang.org/grpc"
@@ -29,7 +29,7 @@ func main() {
 }
 
 func run() error {
-	db, err := internal.NewDBConnection()
+	db, err := db.NewDBConnection()
 	if err != nil {
 		return errors.Wrap(err, "Init Database")
 	}
@@ -73,7 +73,7 @@ func startGRPCServer(db *gorm.DB) error {
 
 func publicMethods() map[string]bool {
 	return map[string]bool{
-		"/users.User/Register": true,
-		"/users.User/Login":    true,
+		"/users.UserService/Register": true,
+		"/users.UserService/Login":    true,
 	}
 }
