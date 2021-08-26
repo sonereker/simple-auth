@@ -8,7 +8,7 @@ import (
 //UserDBModel is the DB model for User
 type UserDBModel struct {
 	gorm.Model
-	Email    string `gorm:"index not null"`
+	Email    string `gorm:"index:idx_email,unique"`
 	Password string `gorm:"not null"`
 }
 

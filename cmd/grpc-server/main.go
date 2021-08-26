@@ -16,8 +16,8 @@ import (
 )
 
 var (
-	grpcServerEndpoint = flag.String("grpc-server-endpoint", "localhost:8070", "gRPC server endpoint")
-	tokenSecret        = flag.String("jwt-secret", "", "JWT secret")
+	grpcServerAddr = flag.String("grpc-server-addr", ":8070", "gRPC Server Address")
+	tokenSecret    = flag.String("jwt-secret", "", "2AB89F28-0DF2-4D47-93AD-97810483C515")
 )
 
 func main() {
@@ -48,7 +48,7 @@ func run() error {
 }
 
 func startGRPCServer(db *gorm.DB) error {
-	lis, err := net.Listen("tcp", *grpcServerEndpoint)
+	lis, err := net.Listen("tcp", *grpcServerAddr)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -62,9 +62,9 @@ func startGRPCServer(db *gorm.DB) error {
 	gs := grpc.NewServer(serverOptions...)
 
 	usersService := users.NewUserService(db, authManager)
-	pb.RegisterUsersServer(gs, usersService)
+	pb.RegisterUserServer(gs, usersService)
 
-	log.Println("Running GRPC Server at " + *grpcServerEndpoint)
+	log.Println("Running GRPC Server at " + *grpcServerAddr)
 	if err := gs.Serve(lis); err != nil {
 		return err
 	}
@@ -73,6 +73,7 @@ func startGRPCServer(db *gorm.DB) error {
 
 func publicMethods() map[string]bool {
 	return map[string]bool{
-		"/users.Users/Register": true,
+		"/users.User/Register": true,
+		"/users.User/Login":    true,
 	}
 }

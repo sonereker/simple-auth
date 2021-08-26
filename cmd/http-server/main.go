@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
-	"github.com/sonereker/simple-auth/internal"
 	"github.com/sonereker/simple-auth/pb/v1"
-	"github.com/sonereker/simple-auth/users"
 	"google.golang.org/grpc"
 	"log"
 	"net/http"
@@ -16,8 +14,8 @@ import (
 )
 
 var (
-	grpcServerEndpoint = flag.String("grpc-server-endpoint", "localhost:8070", "gRPC server endpoint")
-	httpServerEndpoint = flag.String("http-server-endpoint", "localhost:8080", "HTTP server endpoint")
+	grpcServerAddr = flag.String("grpc-server-endpoint", "localhost:8070", "gRPC Server Address")
+	httpServerAddr = flag.String("http-server-endpoint", "localhost:8080", "HTTP Server Address")
 )
 
 func main() {
@@ -29,17 +27,7 @@ func main() {
 }
 
 func run() error {
-	db, err := internal.NewDBConnection()
-	if err != nil {
-		return errors.Wrap(err, "Init Database")
-	}
-
-	err = db.AutoMigrate(&users.UserDBModel{})
-	if err != nil {
-		return errors.Wrap(err, "Run Migrations")
-	}
-
-	err = startHTTPServer()
+	err := startHTTPServer()
 	if err != nil {
 		return errors.Wrap(err, "Start HTTP Server")
 	}
@@ -51,7 +39,7 @@ func startHTTPServer() error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	conn, err := grpc.Dial(*grpcServerEndpoint, grpc.WithInsecure())
+	conn, err := grpc.Dial(*grpcServerAddr, grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
@@ -59,13 +47,13 @@ func startHTTPServer() error {
 
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	err = pb.RegisterUsersHandlerFromEndpoint(ctx, mux, *grpcServerEndpoint, opts)
+	err = pb.RegisterUserHandlerFromEndpoint(ctx, mux, *grpcServerAddr, opts)
 	if err != nil {
 		return err
 	}
 
-	log.Println("Running HTTP Server at " + *httpServerEndpoint)
-	err = http.ListenAndServe(*httpServerEndpoint, mux)
+	log.Println("Running HTTP Server at " + *httpServerAddr)
+	err = http.ListenAndServe(*httpServerAddr, mux)
 	if err != nil {
 		return err
 	}

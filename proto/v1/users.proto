@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 
 option go_package = "github.com/sonereker/simple-auth/pb";
 
-service Users {
+service User {
   rpc Register(RegistrationRequest) returns (AuthenticationResponse) {
     option (google.api.http) = {
       post: "/v1/users"
@@ -46,7 +46,6 @@ message UserResponse {
 
 message AuthenticationResponse {
   string token = 1;
-  string refreshToken = 2;
   UserResponse user = 3;
 }
 

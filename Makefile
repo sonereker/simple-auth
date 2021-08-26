@@ -35,3 +35,6 @@ generate: install-tools
 
 test:
 	go test -race ./...
+
+test-integration:
+	go test -tags integration -v ./users

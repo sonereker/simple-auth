@@ -34,6 +34,22 @@ services:
       - DB_PASSWORD=local
       - DB_PORT=5432
       - DB_SSL_MODE=disable
+  integration-tests:
+    build:
+      context: .
+      dockerfile: ./docker/integration-tests/Dockerfile
+    container_name: integration-tests
+    depends_on:
+      - grpc_server
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_NAME=simple_auth
+      - DB_USERNAME=local
+      - DB_PASSWORD=local
+      - DB_PORT=5432
+      - DB_SSL_MODE=disable
+      - GRPC_SERVER_ADDR=grpc_server:8070
 
   db:
     image: 'postgres:13.1-alpine'

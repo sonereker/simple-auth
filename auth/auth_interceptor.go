@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -21,10 +20,9 @@ func NewAuthInterceptor(am *AuthManager, publicMethods map[string]bool) *authInt
 	}
 }
 
-func (ai *authInterceptor) Unary() grpc.UnaryServerInterceptor {
+func (interceptor *authInterceptor) Unary() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		fmt.Println(info.FullMethod)
-		err := ai.authorize(ctx, info.FullMethod)
+		ctx, err := interceptor.authorize(ctx, info.FullMethod)
 		if err != nil {
 			return nil, err
 		}
@@ -33,27 +31,29 @@ func (ai *authInterceptor) Unary() grpc.UnaryServerInterceptor {
 	}
 }
 
-func (ai *authInterceptor) authorize(ctx context.Context, method string) error {
-	_, ok := ai.publicMethods[method]
+func (interceptor *authInterceptor) authorize(ctx context.Context, method string) (context.Context, error) {
+	_, ok := interceptor.publicMethods[method]
 	if ok {
-		return nil
+		return nil, nil
 	}
 
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return status.Errorf(codes.Unauthenticated, "metadata is not provided")
+		return nil, status.Errorf(codes.Unauthenticated, "metadata is not provided")
 	}
 
-	values := md["Authorization"]
+	values := md["authorization"]
 	if len(values) == 0 {
-		return status.Errorf(codes.Unauthenticated, "authorization token is not provided")
+		return nil, status.Errorf(codes.Unauthenticated, "authorization token is not provided")
 	}
 
 	accessToken := values[0]
-	_, err := ai.authManager.verifyToken(accessToken)
+	claims, err := interceptor.authManager.VerifyToken(accessToken)
 	if err != nil {
-		return status.Errorf(codes.Unauthenticated, "access token is invalid: %v", err)
+		return nil, status.Errorf(codes.Unauthenticated, "access token is invalid: %v", err)
 	}
 
-	return nil
+	ctx = context.WithValue(ctx, "id", claims.ID)
+
+	return ctx, nil
 }

@@ -1,8 +1,13 @@
-# Simple-Auth
+# Simple Auth
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/sonereker/simple-auth)](https://goreportcard.com/report/github.com/sonereker/simple-auth)
 
-An example gRPC/REST/JWT user authentication service.
+An example user registration and authentication service featuring;
+- gRPC Server
+- HTTP Server for REST endpoints generated with `grpc-gateway`
+- JWT for authentication
+- Swagger REST API documentation
+- Containerized services/integration tests
 
 ## Quick Run
 
@@ -25,11 +30,12 @@ Generate gRPC and REST bindings;
 make generate
 ```
 
-Environment variables required;
-
+Environment variables required for database connection;
 ```
 DB_HOST=localhost;DB_NAME=simple_auth;DB_USERNAME=local;DB_PASSWORD=local;DB_PORT=5432;DB_SSL_MODE=disable
 ```
+
+For integration tests `GRPC_SERVER_ADDR` variable is also required. See `docker-compose.yml` for details.
 
 ## Tests
 
@@ -45,5 +51,12 @@ There's the `users/service_integration_test.go` test covering the basic function
 database server (see Quick Run) just run test with `tags` flag.
 
 ```
-go test -tags integration -v ./..
+make test-integation
+```
+
+or easier way is just running `integration-test` with docker-compose;
+
+```
+docker-compose build
+docker-compose up
 ```

@@ -3,15 +3,14 @@ package users
 import (
 	"context"
 	"errors"
-	"github.com/dgrijalva/jwt-go"
+	"fmt"
 	"github.com/sonereker/simple-auth/auth"
 	"github.com/sonereker/simple-auth/pb/v1"
 	"gorm.io/gorm"
-	"time"
 )
 
 type userService struct {
-	pb.UnimplementedUsersServer
+	pb.UnimplementedUserServer
 	authManager *auth.AuthManager
 	DB          *gorm.DB
 }
@@ -20,18 +19,24 @@ func NewUserService(db *gorm.DB, am *auth.AuthManager) *userService {
 	return &userService{DB: db, authManager: am}
 }
 
-func (s *userService) Register(ctx context.Context, rr *pb.RegistrationRequest) (*pb.AuthenticationResponse, error) {
+func (service *userService) Register(ctx context.Context, rr *pb.RegistrationRequest) (*pb.AuthenticationResponse, error) {
 	var user UserDBModel
-	result := s.DB.Take(&user, "email = ?", rr.Email)
+	result := service.DB.Take(&user, "email = ?", rr.Email)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		user.Password = auth.HashAndSalt(user.Password)
-		result := s.DB.Create(&user)
+		user.Email = rr.Email
+		hashedPassword, err := auth.Hash(rr.Password)
+		if err != nil {
+			return nil, err
+		}
+		user.Password = hashedPassword
+		fmt.Printf("Creating new user with email %s and password %s\n", rr.Email, hashedPassword)
+		result := service.DB.Create(&user)
 		if result.Error != nil {
 			return nil, result.Error
 		}
 	}
 
-	authenticationResponse, err := s.Login(ctx, &pb.LoginRequest{
+	authenticationResponse, err := service.Login(ctx, &pb.LoginRequest{
 		Email:    rr.Email,
 		Password: rr.Password,
 	})
@@ -42,54 +47,32 @@ func (s *userService) Register(ctx context.Context, rr *pb.RegistrationRequest) 
 	return authenticationResponse, nil
 }
 
-func (s *userService) Login(ctx context.Context, lr *pb.LoginRequest) (*pb.AuthenticationResponse, error) {
+func (service *userService) Login(_ context.Context, lr *pb.LoginRequest) (*pb.AuthenticationResponse, error) {
 	var user UserDBModel
-	result := s.DB.Take(&user, "email = ?", lr.Email)
+	result := service.DB.Take(&user, "email = ?", lr.Email)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, errors.New("user not found")
+		return nil, errors.New("user with email " + lr.Email + " not found")
 	}
 
-	if !auth.ComparePasswords(user.Password, []byte(lr.Password)) {
-		return nil, errors.New("email or password is incorrect")
+	if !auth.IsCorrectPassword(user.Password, lr.Password) {
+		return nil, errors.New("password is incorrect")
 	}
 
-	expirationTime := time.Now().Add(10 * time.Minute)
-	claims := &auth.UserClaims{
-		Email:  lr.Email,
-		UserID: user.ID,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(s.authManager.TokenSecret)
-
-	refreshExpirationTime := time.Now().Add(24 * time.Hour)
-	refreshClaims := &auth.UserClaims{
-		Email:  lr.Email,
-		UserID: user.ID,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: refreshExpirationTime.Unix(),
-		},
-	}
-
-	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
-	refreshTokenString, err := refreshToken.SignedString(s.authManager.TokenSecret)
+	tokenString, err := service.authManager.GenerateToken(user.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &pb.AuthenticationResponse{
-		Token:        tokenString,
-		RefreshToken: refreshTokenString,
-		User:         user.AsResponse(),
+		Token: tokenString,
+		User:  user.AsResponse(),
 	}, nil
 }
 
-func (s *userService) GetCurrent(ctx context.Context, in *pb.EmptyParams) (*pb.UserResponse, error) {
+func (service *userService) GetCurrent(ctx context.Context, _ *pb.EmptyParams) (*pb.UserResponse, error) {
+	id := ctx.Value("id")
 	var user UserDBModel
-	s.DB.Take(&user, "id = ?", 1)
+	service.DB.Take(&user, "id = ?", id)
 
 	return &pb.UserResponse{Email: user.Email}, nil
 }

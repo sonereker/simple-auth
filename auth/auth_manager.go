@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
-	"log"
+	"time"
 )
 
 type AuthManager struct {
@@ -19,11 +19,26 @@ func NewAuthManager(tokenSecret string) *AuthManager {
 
 type UserClaims struct {
 	jwt.StandardClaims
-	UserID uint
-	Email  string
+	ID uint
 }
 
-func (am *AuthManager) verifyToken(accessToken string) (*UserClaims, error) {
+func (manager *AuthManager) GenerateToken(userID uint) (string, error) {
+	expirationTime := time.Now().Add(10 * time.Minute)
+	claims := &UserClaims{
+		ID: userID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(manager.TokenSecret))
+	if err != nil {
+		return "", err
+	}
+	return tokenString, nil
+}
+
+func (manager *AuthManager) VerifyToken(accessToken string) (*UserClaims, error) {
 	token, err := jwt.ParseWithClaims(
 		accessToken,
 		&UserClaims{},
@@ -33,7 +48,7 @@ func (am *AuthManager) verifyToken(accessToken string) (*UserClaims, error) {
 				return nil, fmt.Errorf("unexpected token signing method")
 			}
 
-			return []byte(am.TokenSecret), nil
+			return []byte(manager.TokenSecret), nil
 		},
 	)
 	if err != nil {
@@ -51,20 +66,15 @@ func (am *AuthManager) verifyToken(accessToken string) (*UserClaims, error) {
 	}
 }
 
-func HashAndSalt(password string) string {
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+func Hash(password string) (string, error) {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Println(err)
+		return "", err
 	}
-	return string(hash)
+	return string(hashed), nil
 }
 
-func ComparePasswords(hashedPassword string, plainPassword []byte) bool {
-	byteHash := []byte(hashedPassword)
-	err := bcrypt.CompareHashAndPassword(byteHash, plainPassword)
-	if err != nil {
-		log.Println(err)
-		return false
-	}
-	return true
+func IsCorrectPassword(hashedPassword string, plainPassword string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword))
+	return err == nil
 }
