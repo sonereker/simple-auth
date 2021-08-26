@@ -1,6 +1,6 @@
 # Simple Auth
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/sonereker/simple-auth)](https://goreportcard.com/report/github.com/sonereker/simple-auth)
+[![Go Report Card](https://goreportcard.com/badge/github.com/sonereker/simple-auth?2)](https://goreportcard.com/report/github.com/sonereker/simple-auth)
 
 An example user registration and authentication service featuring;
 - gRPC Server
