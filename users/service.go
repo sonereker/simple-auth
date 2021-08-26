@@ -10,7 +10,7 @@ import (
 )
 
 type userService struct {
-	pb.UnimplementedUserServer
+	pb.UnimplementedUserServiceServer
 	authManager *auth.AuthManager
 	DB          *gorm.DB
 }
@@ -69,7 +69,7 @@ func (service *userService) Login(_ context.Context, lr *pb.LoginRequest) (*pb.A
 	}, nil
 }
 
-func (service *userService) GetCurrent(ctx context.Context, _ *pb.EmptyParams) (*pb.UserResponse, error) {
+func (service *userService) GetCurrent(ctx context.Context, _ *pb.Empty) (*pb.UserResponse, error) {
 	id := ctx.Value("id")
 	var user UserDBModel
 	service.DB.Take(&user, "id = ?", id)

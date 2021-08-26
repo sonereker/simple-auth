@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	grpcServerAddr = flag.String("grpc-server-endpoint", "localhost:8070", "gRPC Server Address")
-	httpServerAddr = flag.String("http-server-endpoint", "localhost:8080", "HTTP Server Address")
+	grpcServerAddr = flag.String("grpc-server-endpoint", ":8070", "gRPC Server Address")
+	httpServerAddr = flag.String("http-server-endpoint", ":8080", "HTTP Server Address")
 )
 
 func main() {
@@ -45,17 +45,29 @@ func startHTTPServer() error {
 	}
 	defer conn.Close()
 
-	mux := runtime.NewServeMux()
+	rmux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	err = pb.RegisterUserHandlerFromEndpoint(ctx, mux, *grpcServerAddr, opts)
+	err = pb.RegisterUserServiceHandlerFromEndpoint(ctx, rmux, *grpcServerAddr, opts)
 	if err != nil {
 		return err
 	}
 
+	// Swagger
+	smux := http.NewServeMux()
+	smux.Handle("/", rmux)
+	smux.HandleFunc("/swagger.json", handleSwagger)
+	fs := http.FileServer(http.Dir("www/swagger-ui"))
+	smux.Handle("/swagger-ui/", http.StripPrefix("/swagger-ui", fs))
+
 	log.Println("Running HTTP Server at " + *httpServerAddr)
-	err = http.ListenAndServe(*httpServerAddr, mux)
+	log.Println("Swagger is at: http://localhost:8080/swagger-ui/")
+	err = http.ListenAndServe(*httpServerAddr, smux)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func handleSwagger(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "www/swagger.json")
 }

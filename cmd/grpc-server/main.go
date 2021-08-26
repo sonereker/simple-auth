@@ -62,7 +62,7 @@ func startGRPCServer(db *gorm.DB) error {
 	gs := grpc.NewServer(serverOptions...)
 
 	usersService := users.NewUserService(db, authManager)
-	pb.RegisterUserServer(gs, usersService)
+	pb.RegisterUserServiceServer(gs, usersService)
 
 	log.Println("Running GRPC Server at " + *grpcServerAddr)
 	if err := gs.Serve(lis); err != nil {

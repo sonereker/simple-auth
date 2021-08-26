@@ -31,10 +31,16 @@ generate: install-tools
 		--go-grpc_opt=paths=source_relative \
 		--grpc-gateway_out=pb \
 		--grpc-gateway_opt=paths=source_relative \
+		--swagger_out=logtostderr=true:pb \
 		proto/v1/*.proto
-
+	cp pb/v1/users.swagger.json www/swagger.json
 test:
 	go test -race ./...
 
 test-integration:
 	go test -tags integration -v ./users
+
+build: generate
+	go generate ./...
+	go build -o bin/grpc_server cmd/grpc-server/*.go
+	go build -o bin/http_server cmd/http-server/*.go
