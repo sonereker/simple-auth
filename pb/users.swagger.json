@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "v1/users.proto",
+    "title": "users.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/v1/users": {
+    "/users": {
       "post": {
         "operationId": "UserService_Register",
         "responses": {
@@ -43,7 +43,7 @@
         ]
       }
     },
-    "/v1/users/current": {
+    "/users/current": {
       "get": {
         "operationId": "UserService_GetCurrent",
         "responses": {
@@ -65,7 +65,7 @@
         ]
       }
     },
-    "/v1/users/login": {
+    "/users/login": {
       "post": {
         "operationId": "UserService_Login",
         "responses": {

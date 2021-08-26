@@ -11,6 +11,9 @@ import (
 //NewDBConnection establishes a new DB connection
 func NewDBConnection() (*gorm.DB, error) {
 	dsn, err := prepareConnectionParams()
+	if err != nil {
+		return nil, err
+	}
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {

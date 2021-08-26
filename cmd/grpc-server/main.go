@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/sonereker/simple-auth/common"
-	"github.com/sonereker/simple-auth/pb/v1"
+	"github.com/sonereker/simple-auth/pb"
 	"github.com/sonereker/simple-auth/server"
 	"github.com/sonereker/simple-auth/users"
 	"google.golang.org/grpc"

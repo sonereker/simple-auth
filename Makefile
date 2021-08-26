@@ -32,8 +32,8 @@ generate: install-tools
 		--grpc-gateway_out=pb \
 		--grpc-gateway_opt=paths=source_relative \
 		--swagger_out=logtostderr=true:pb \
-		proto/v1/*.proto
-	cp pb/v1/users.swagger.json www/swagger.json
+		proto/*.proto
+	cp pb/users.swagger.json www/swagger.json
 test:
 	go test -race ./...
 

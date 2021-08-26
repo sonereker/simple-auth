@@ -9,19 +9,19 @@ option go_package = "github.com/sonereker/simple-auth/pb";
 service UserService {
   rpc Register(RegistrationRequest) returns (AuthenticationResponse) {
     option (google.api.http) = {
-      post: "/v1/users"
+      post: "/users"
       body: "*"
     };
   }
   rpc Login(LoginRequest) returns (AuthenticationResponse) {
     option (google.api.http) = {
-      post: "/v1/users/login"
+      post: "/users/login"
       body: "*"
     };
   }
   rpc GetCurrent(Empty) returns (UserResponse) {
     option (google.api.http) = {
-      get: "/v1/users/current"
+      get: "/users/current"
     };
   }
 }
