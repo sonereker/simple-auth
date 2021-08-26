@@ -44,7 +44,6 @@ lint:
 test-integration:
 	go test -tags integration -v ./users
 
-build: generate
-	go generate ./...
+build:
 	go build -o bin/grpc_server cmd/grpc-server/*.go
 	go build -o bin/http_server cmd/http-server/*.go
