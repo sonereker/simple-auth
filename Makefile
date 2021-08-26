@@ -37,6 +37,10 @@ generate: install-tools
 test:
 	go test -race ./...
 
+lint:
+	golint ./...
+	go vet ./...
+
 test-integration:
 	go test -tags integration -v ./users
 

@@ -1,4 +1,4 @@
-package auth
+package server
 
 import (
 	"context"
@@ -8,21 +8,22 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type authInterceptor struct {
+//AuthInterceptor is the Interceptor struct for server
+type AuthInterceptor struct {
 	authManager   *AuthManager
 	publicMethods map[string]bool
 }
 
 //NewAuthInterceptor creates a new NewAuthInterceptor instance
-func NewAuthInterceptor(am *AuthManager, publicMethods map[string]bool) *authInterceptor {
-	return &authInterceptor{
+func NewAuthInterceptor(am *AuthManager, publicMethods map[string]bool) *AuthInterceptor {
+	return &AuthInterceptor{
 		authManager:   am,
 		publicMethods: publicMethods,
 	}
 }
 
 //Unary creates a new UnaryServerInterceptor
-func (interceptor *authInterceptor) Unary() grpc.UnaryServerInterceptor {
+func (interceptor *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		ctx, err := interceptor.authorize(ctx, info.FullMethod)
 		if err != nil {
@@ -33,7 +34,10 @@ func (interceptor *authInterceptor) Unary() grpc.UnaryServerInterceptor {
 	}
 }
 
-func (interceptor *authInterceptor) authorize(ctx context.Context, method string) (context.Context, error) {
+//UserIDKey is the struct used for passing User ID with context
+type UserIDKey struct{}
+
+func (interceptor *AuthInterceptor) authorize(ctx context.Context, method string) (context.Context, error) {
 	_, ok := interceptor.publicMethods[method]
 	if ok {
 		return nil, nil
@@ -55,7 +59,7 @@ func (interceptor *authInterceptor) authorize(ctx context.Context, method string
 		return nil, status.Errorf(codes.Unauthenticated, "access token is invalid: %v", err)
 	}
 
-	ctx = context.WithValue(ctx, "id", claims.ID)
+	ctx = context.WithValue(ctx, UserIDKey{}, claims.ID)
 
 	return ctx, nil
 }

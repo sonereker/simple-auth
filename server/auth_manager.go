@@ -1,4 +1,4 @@
-package auth
+package server
 
 import (
 	"fmt"
@@ -66,9 +66,9 @@ func (manager *AuthManager) VerifyToken(accessToken string) (*UserClaims, error)
 			return nil, fmt.Errorf("invalid token claims")
 		}
 		return claims, err
-	} else {
-		return nil, err
 	}
+
+	return nil, err
 }
 
 //Hash generates hash for the given password

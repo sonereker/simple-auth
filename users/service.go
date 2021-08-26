@@ -4,29 +4,30 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/sonereker/simple-auth/auth"
 	"github.com/sonereker/simple-auth/pb/v1"
+	"github.com/sonereker/simple-auth/server"
 	"gorm.io/gorm"
 )
 
-type userService struct {
+//UserService is the struct holding User operations
+type UserService struct {
 	pb.UnimplementedUserServiceServer
-	authManager *auth.AuthManager
+	authManager *server.AuthManager
 	DB          *gorm.DB
 }
 
-//NewUserService creates a new userService with provided params
-func NewUserService(db *gorm.DB, am *auth.AuthManager) *userService {
-	return &userService{DB: db, authManager: am}
+//NewUserService creates a new UserService with provided params
+func NewUserService(db *gorm.DB, am *server.AuthManager) *UserService {
+	return &UserService{DB: db, authManager: am}
 }
 
 //Register creates the new user and returns a token with created user info
-func (service *userService) Register(ctx context.Context, rr *pb.RegistrationRequest) (*pb.AuthenticationResponse, error) {
+func (service *UserService) Register(ctx context.Context, rr *pb.RegistrationRequest) (*pb.AuthenticationResponse, error) {
 	var user UserDBModel
 	result := service.DB.Take(&user, "email = ?", rr.Email)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		user.Email = rr.Email
-		hashedPassword, err := auth.Hash(rr.Password)
+		hashedPassword, err := server.Hash(rr.Password)
 		if err != nil {
 			return nil, err
 		}
@@ -50,14 +51,14 @@ func (service *userService) Register(ctx context.Context, rr *pb.RegistrationReq
 }
 
 //Login returns a JWT token if a user exists with given credentials
-func (service *userService) Login(_ context.Context, lr *pb.LoginRequest) (*pb.AuthenticationResponse, error) {
+func (service *UserService) Login(_ context.Context, lr *pb.LoginRequest) (*pb.AuthenticationResponse, error) {
 	var user UserDBModel
 	result := service.DB.Take(&user, "email = ?", lr.Email)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, errors.New("user with email " + lr.Email + " not found")
 	}
 
-	if !auth.IsCorrectPassword(user.Password, lr.Password) {
+	if !server.IsCorrectPassword(user.Password, lr.Password) {
 		return nil, errors.New("password is incorrect")
 	}
 
@@ -73,8 +74,8 @@ func (service *userService) Login(_ context.Context, lr *pb.LoginRequest) (*pb.A
 }
 
 //GetCurrent returns current user with the token
-func (service *userService) GetCurrent(ctx context.Context, _ *pb.Empty) (*pb.UserResponse, error) {
-	id := ctx.Value("id")
+func (service *UserService) GetCurrent(ctx context.Context, _ *pb.Empty) (*pb.UserResponse, error) {
+	id := ctx.Value(server.UserIDKey{})
 	var user UserDBModel
 	service.DB.Take(&user, "id = ?", id)
 

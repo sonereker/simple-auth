@@ -4,9 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/sonereker/simple-auth/auth"
-	"github.com/sonereker/simple-auth/db"
+	"github.com/sonereker/simple-auth/common"
 	"github.com/sonereker/simple-auth/pb/v1"
+	"github.com/sonereker/simple-auth/server"
 	"github.com/sonereker/simple-auth/users"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
@@ -29,7 +29,7 @@ func main() {
 }
 
 func run() error {
-	db, err := db.NewDBConnection()
+	db, err := common.NewDBConnection()
 	if err != nil {
 		return errors.Wrap(err, "Init Database")
 	}
@@ -53,8 +53,8 @@ func startGRPCServer(db *gorm.DB) error {
 		log.Fatal(err)
 	}
 
-	authManager := auth.NewAuthManager(*tokenSecret)
-	authInterceptor := auth.NewAuthInterceptor(authManager, publicMethods())
+	authManager := server.NewAuthManager(*tokenSecret)
+	authInterceptor := server.NewAuthInterceptor(authManager, publicMethods())
 	serverOptions := []grpc.ServerOption{
 		grpc.UnaryInterceptor(authInterceptor.Unary()),
 	}
