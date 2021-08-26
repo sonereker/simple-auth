@@ -4,7 +4,7 @@
 
 An example user registration and authentication service featuring;
 - gRPC Server
-- HTTP Server for REST endpoints generated with `grpc-gateway`
+- HTTP Server with REST endpoints generated with `grpc-gateway`
 - JWT for authentication
 - Swagger REST API documentation
 - Containerized services/integration tests
