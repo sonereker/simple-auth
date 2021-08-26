@@ -1,5 +1,7 @@
 # Simple Auth
 
+[![Go](https://github.com/sonereker/simple-auth/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/sonereker/simple-auth/actions/workflows/go.yml)
+[![GoDoc](https://godoc.org/github.com/sonereker/simple-auth?status.png)](http://godoc.org/github.com/sonereker/simple-auth)
 [![Go Report Card](https://goreportcard.com/badge/github.com/sonereker/simple-auth?2)](https://goreportcard.com/report/github.com/sonereker/simple-auth)
 
 An example user registration and authentication service featuring;
