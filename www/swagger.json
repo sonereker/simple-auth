@@ -1,9 +1,22 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "v1/users.proto",
-    "version": "version not set"
+    "title": "SimpleAuth",
+    "version": "1.0",
+    "contact": {
+      "name": "Soner Eker",
+      "url": "https://github.com/sonereker/simple-auth",
+      "email": "soner@sonereker.com"
+    },
+    "license": {
+      "name": " Unlicense License",
+      "url": "https://github.com/sonereker/simple-auth/blob/main/LICENSE"
+    }
   },
+  "schemes": [
+    "http",
+    "https"
+  ],
   "consumes": [
     "application/json"
   ],
