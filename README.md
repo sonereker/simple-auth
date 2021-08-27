@@ -25,6 +25,13 @@ docker-compose build
 docker-compose up
 ```
 
+will build and start these containers;
+
+- `grpc_server`
+- `http_server`
+- `db` (postgres:13.1-alpine)
+- `integration-tests`
+
 ## RESTful API
 
 After `Quick Run`, you have a RESTful API server running at http://localhost:8080. It provides the following endpoints:
