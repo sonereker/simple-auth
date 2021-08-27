@@ -4,10 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/sonereker/simple-auth/common"
-	"github.com/sonereker/simple-auth/pb/v1"
-	"github.com/sonereker/simple-auth/server"
-	"github.com/sonereker/simple-auth/users"
+	"github.com/sonereker/simple-auth/internal/config"
+	"github.com/sonereker/simple-auth/internal/pb/v1"
+	"github.com/sonereker/simple-auth/internal/server"
+	"github.com/sonereker/simple-auth/internal/users"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 	"log"
@@ -31,7 +31,7 @@ func main() {
 }
 
 func run() error {
-	db, err := common.NewDBConnection()
+	db, err := config.NewDBConnection()
 	if err != nil {
 		return errors.Wrap(err, "Init Database")
 	}

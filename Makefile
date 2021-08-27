@@ -25,15 +25,15 @@ endif
 generate: install-tools
 	protoc --proto_path=proto \
    		--proto_path=$(GRPC_GATEWAY_DIR)/third_party/googleapis \
-		--go_out=pb \
+		--go_out=internal/pb \
 		--go_opt=paths=source_relative \
-		--go-grpc_out=pb \
+		--go-grpc_out=internal/pb \
 		--go-grpc_opt=paths=source_relative \
-		--grpc-gateway_out=pb \
+		--grpc-gateway_out=internal/pb \
 		--grpc-gateway_opt=paths=source_relative \
-		--swagger_out=logtostderr=true:pb \
+		--swagger_out=logtostderr=true:internal/pb \
 		proto/v1/*.proto
-	cp pb/v1/users.swagger.json www/swagger.json
+	cp internal/pb/v1/users.swagger.json www/swagger.json
 test:
 	go test -race ./...
 
