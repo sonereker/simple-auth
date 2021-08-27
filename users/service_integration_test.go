@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/sonereker/simple-auth/client"
-	"github.com/sonereker/simple-auth/pb"
+	"github.com/sonereker/simple-auth/pb/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"os"

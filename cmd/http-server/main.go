@@ -2,11 +2,10 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
-	"github.com/sonereker/simple-auth/pb"
+	"github.com/sonereker/simple-auth/pb/v1"
 	"google.golang.org/grpc"
 	"log"
 	"net/http"
@@ -14,12 +13,11 @@ import (
 )
 
 var (
-	grpcServerAddr = flag.String("grpc-server-endpoint", ":8070", "gRPC Server Address")
-	httpServerAddr = flag.String("http-server-endpoint", ":8080", "HTTP Server Address")
+	grpcServerAddr string
+	httpServerAddr string
 )
 
 func main() {
-	flag.Parse()
 	if err := run(); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%s/n", err)
 		os.Exit(1)
@@ -27,6 +25,9 @@ func main() {
 }
 
 func run() error {
+	grpcServerAddr = os.Getenv("GRPC_SERVER_ADDR")
+	httpServerAddr = os.Getenv("HTTP_SERVER_ADDR")
+
 	err := startHTTPServer()
 	if err != nil {
 		return errors.Wrap(err, "Start HTTP Server")
@@ -39,7 +40,7 @@ func startHTTPServer() error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	conn, err := grpc.Dial(*grpcServerAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(grpcServerAddr, grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
@@ -47,7 +48,7 @@ func startHTTPServer() error {
 
 	rmux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	err = pb.RegisterUserServiceHandlerFromEndpoint(ctx, rmux, *grpcServerAddr, opts)
+	err = pb.RegisterUserServiceHandlerFromEndpoint(ctx, rmux, grpcServerAddr, opts)
 	if err != nil {
 		return err
 	}
@@ -59,9 +60,9 @@ func startHTTPServer() error {
 	fs := http.FileServer(http.Dir("www/swagger-ui"))
 	smux.Handle("/swagger-ui/", http.StripPrefix("/swagger-ui", fs))
 
-	log.Println("Running HTTP Server at " + *httpServerAddr)
-	log.Println("Swagger is at: http://localhost:8080/swagger-ui/")
-	err = http.ListenAndServe(*httpServerAddr, smux)
+	log.Println("Running HTTP Server at " + httpServerAddr)
+	log.Println("Swagger is at: " + httpServerAddr + "/swagger-ui/")
+	err = http.ListenAndServe(httpServerAddr, smux)
 	if err != nil {
 		return err
 	}

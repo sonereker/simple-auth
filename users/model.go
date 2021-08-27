@@ -1,7 +1,7 @@
 package users
 
 import (
-	"github.com/sonereker/simple-auth/pb"
+	"github.com/sonereker/simple-auth/pb/v1"
 	"gorm.io/gorm"
 )
 

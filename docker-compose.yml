@@ -17,6 +17,7 @@ services:
       - DB_PASSWORD=local
       - DB_PORT=5432
       - DB_SSL_MODE=disable
+      - GRPC_SERVER_ADDR=:8070
 
   http_server:
     build:
@@ -34,6 +35,9 @@ services:
       - DB_PASSWORD=local
       - DB_PORT=5432
       - DB_SSL_MODE=disable
+      - HTTP_SERVER_ADDR=:8080
+      - GRPC_SERVER_ADDR=grpc_server:8070
+
   integration-tests:
     build:
       context: .

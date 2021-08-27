@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/sonereker/simple-auth/common"
-	"github.com/sonereker/simple-auth/pb"
+	"github.com/sonereker/simple-auth/pb/v1"
 	"github.com/sonereker/simple-auth/server"
 	"github.com/sonereker/simple-auth/users"
 	"google.golang.org/grpc"
@@ -16,11 +16,13 @@ import (
 )
 
 var (
-	grpcServerAddr = flag.String("grpc-server-addr", ":8070", "gRPC Server Address")
+	grpcServerAddr string
 	tokenSecret    = flag.String("jwt-secret", "", "2AB89F28-0DF2-4D47-93AD-97810483C515")
 )
 
 func main() {
+	grpcServerAddr = os.Getenv("GRPC_SERVER_ADDR")
+
 	flag.Parse()
 	if err := run(); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%s/n", err)
@@ -48,7 +50,7 @@ func run() error {
 }
 
 func startGRPCServer(db *gorm.DB) error {
-	lis, err := net.Listen("tcp", *grpcServerAddr)
+	lis, err := net.Listen("tcp", grpcServerAddr)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,7 +66,7 @@ func startGRPCServer(db *gorm.DB) error {
 	usersService := users.NewUserService(db, authManager)
 	pb.RegisterUserServiceServer(gs, usersService)
 
-	log.Println("Running GRPC Server at " + *grpcServerAddr)
+	log.Println("Running GRPC Server at " + grpcServerAddr)
 	if err := gs.Serve(lis); err != nil {
 		return err
 	}

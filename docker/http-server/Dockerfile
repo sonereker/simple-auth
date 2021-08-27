@@ -19,6 +19,7 @@ WORKDIR /app
 
 RUN cp /build/http_server .
 
+COPY /www www/
 EXPOSE 8080
 
 CMD ["/app/http_server"]

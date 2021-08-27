@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/sonereker/simple-auth/pb"
+	"github.com/sonereker/simple-auth/pb/v1"
 	"github.com/sonereker/simple-auth/server"
 	"gorm.io/gorm"
 )
