@@ -26,3 +26,9 @@ jobs:
 
     - name: Go report card
       uses: creekorful/goreportcard-action@v1.0
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage-all.out

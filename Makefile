@@ -2,7 +2,9 @@ GOOGLE_APIS_DIR := $(shell go list -f '{{ .Dir }}' -m github.com/googleapis/goog
 GRPC_GATEWAY_DIR := $(shell go list -f '{{ .Dir }}' -m github.com/grpc-ecosystem/grpc-gateway/v2 2> /dev/null)
 PG_VALIDATE_DIR := $(shell go list -f '{{ .Dir }}' -m github.com/envoyproxy/protoc-gen-validate 2> /dev/null)
 GO_INSTALLED := $(shell which go)
+PACKAGES := $(shell go list ./... | grep -v /vendor/)
 
+.PHONY: install-tools
 install-tools:
 ifndef GO_INSTALLED
 	$(error "go is not installed, please run 'brew install go'")
@@ -15,6 +17,7 @@ endif
 		google.golang.org/grpc/cmd/protoc-gen-go-grpc \
 		github.com/envoyproxy/protoc-gen-validate
 
+.PHONY: generate
 generate: install-tools
 	protoc --proto_path=proto \
    		--proto_path=$(GOOGLE_APIS_DIR) \
@@ -31,16 +34,28 @@ generate: install-tools
 		--validate_opt=paths=source_relative \
 		proto/v1/*.proto
 	cp internal/pb/v1/users.swagger.json www/swagger.json
-test:
-	go test -race ./...
 
+.PHONY: test
+test:
+	@echo "mode: count" > coverage-all.out
+	@$(foreach pkg,$(PACKAGES), \
+		go test -p=1 -cover -covermode=count -coverprofile=coverage.out ${pkg}; \
+		tail -n +2 coverage.out >> coverage-all.out;)
+
+.PHONY: test-cover
+test-cover: test ## run unit tests and show test coverage information
+	go tool cover -html=coverage-all.out
+
+.PHONY: test-lint
 lint:
 	golint ./...
 	go vet ./...
 
+.PHONY: test-integration
 test-integration:
 	go test -tags integration -v ./users
 
+.PHONY: build
 build:
 	go build -o bin/grpc_server cmd/grpc-server/*.go
 	go build -o bin/http_server cmd/http-server/*.go
