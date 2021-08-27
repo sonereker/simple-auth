@@ -23,6 +23,10 @@ func NewUserService(db *gorm.DB, am *server.AuthManager) *UserService {
 
 //Register creates the new user and returns a token with created user info
 func (service *UserService) Register(ctx context.Context, rr *pb.RegistrationRequest) (*pb.AuthenticationResponse, error) {
+	err := rr.Validate()
+	if err != nil {
+		return nil, err
+	}
 	var user UserDBModel
 	result := service.DB.Take(&user, "email = ?", rr.Email)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -52,6 +56,11 @@ func (service *UserService) Register(ctx context.Context, rr *pb.RegistrationReq
 
 //Login returns a JWT token if a user exists with given credentials
 func (service *UserService) Login(_ context.Context, lr *pb.LoginRequest) (*pb.AuthenticationResponse, error) {
+	err := lr.Validate()
+	if err != nil {
+		return nil, err
+	}
+
 	var user UserDBModel
 	result := service.DB.Take(&user, "email = ?", lr.Email)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {

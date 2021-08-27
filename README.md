@@ -11,12 +11,14 @@ An example user registration and authentication service featuring;
 - JWT-based authentication
 - Swagger REST API documentation
 - Containerized integration tests
+- Data validation
 
 Service uses following Go packages;
 
 - Database ORM: [gorm](https://github.com/go-gorm/gorm)
 - JWT: [golang-jwt](https://github.com/golang-jwt/jwt)
 - RESTful Endpoints: [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)
+- Validation: [protoc-gen-validate](https://github.com/envoyproxy/protoc-gen-validate)
 
 ## Quick Run
 
