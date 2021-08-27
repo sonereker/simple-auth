@@ -1,4 +1,4 @@
-GOOGLE_APIS_DIR := $(shell go list -f '{{ .Dir }}' -m github.com/googleapis/googleapis 2> /dev/null)
+GOOGLE_APIS_DIR := $(shell go list -f '{{ .Dir }}' -m github.com/googleapis/googleapis@latest 2> /dev/null)
 GRPC_GATEWAY_DIR := $(shell go list -f '{{ .Dir }}' -m github.com/grpc-ecosystem/grpc-gateway/v2 2> /dev/null)
 PG_VALIDATE_DIR := $(shell go list -f '{{ .Dir }}' -m github.com/envoyproxy/protoc-gen-validate 2> /dev/null)
 GO_INSTALLED := $(shell which go)
@@ -37,13 +37,14 @@ generate: install-tools
 
 .PHONY: test
 test:
+	go test -race ./...
+
+.PHONY: test-cover
+test-cover:
 	@echo "mode: count" > coverage-all.out
 	@$(foreach pkg,$(PACKAGES), \
 		go test -p=1 -cover -covermode=count -coverprofile=coverage.out ${pkg}; \
 		tail -n +2 coverage.out >> coverage-all.out;)
-
-.PHONY: test-cover
-test-cover: test ## run unit tests and show test coverage information
 	go tool cover -html=coverage-all.out
 
 .PHONY: test-lint
