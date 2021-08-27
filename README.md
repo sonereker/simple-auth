@@ -5,11 +5,18 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/sonereker/simple-auth?2)](https://goreportcard.com/report/github.com/sonereker/simple-auth)
 
 An example user registration and authentication service featuring;
+
 - gRPC Server
-- HTTP Server with REST endpoints generated with `grpc-gateway`
-- JWT for authentication
+- HTTP Server with RESTful endpoints
+- JWT-based authentication
 - Swagger REST API documentation
-- Containerized services/integration tests
+- Containerized integration tests
+
+Service uses following Go packages;
+
+- Database ORM: [gorm](https://github.com/go-gorm/gorm)
+- JWT: [golang-jwt](https://github.com/golang-jwt/jwt)
+- RESTful Endpoints: [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)
 
 ## Quick Run
 
@@ -18,31 +25,73 @@ docker-compose build
 docker-compose up
 ```
 
-## REST API Documentation
+## RESTful API
+
+After `Quick Run`, you have a RESTful API server running at http://localhost:8080. It provides the following endpoints:
+
+- `POST /v1/users`: create a new user account
+- `POST /v1/users/login`: login with given credentials
+- `GET /v1/users/current`: get user authenticated with JWT token
+
+with cURL:
+
+1. Create a new user
+```
+curl --location --request POST 'localhost:8080/users' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "email": "dummy@email.com",
+    "password": "hello123"
+}'
+```
+
+2. Login with created user
+```
+curl --location --request POST 'localhost:8080/users/login' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "email": "dummy@email.com",
+    "password": "hello123"
+}'
+```
+
+3. Get current user
+```
+curl --location --request GET 'localhost:8080/users/current' \
+--header 'Authorization: <TOKEN_FROM_STEP2>'
+```
+
+### API Documentation
 
 Swagger UI is available (see `Quick Run`) at http://localhost:8080/swagger-ui/
 
-
 ## Development
 
-Install required tools;
+Install required tools:
 
 ```
 make install-tools
 ```
 
-Generate gRPC and REST bindings;
+Generate gRPC and REST bindings:
 
 ```
 make generate
 ```
 
-Environment variables required for database connection;
-```
-DB_HOST=localhost;DB_NAME=simple_auth;DB_USERNAME=local;DB_PASSWORD=local;DB_PORT=5432;DB_SSL_MODE=disable
-```
+Environment variables required when running services locally:
 
-For integration tests `GRPC_SERVER_ADDR` variable is also required. See `docker-compose.yml` for details.
+```
+DB_HOST=localhost;
+DB_NAME=simple_auth;
+DB_USERNAME=local;
+DB_PASSWORD=local;
+DB_PORT=5432;
+DB_SSL_MODE=disable
+
+GRPC_SERVER_ADDR=localhost:8070
+HTTP_SERVER_ADDR=localhost:8080
+```
 
 ## Tests
 
@@ -61,7 +110,7 @@ database server (see Quick Run) just run test with `tags` flag.
 make test-integation
 ```
 
-or easier way is just running `integration-test` with docker-compose;
+or easier way is just running `integration-test` with docker-compose:
 
 ```
 docker-compose build
