@@ -29,9 +29,9 @@ docker-compose up
 
 After `Quick Run`, you have a RESTful API server running at http://localhost:8080. It provides the following endpoints:
 
-- `POST /v1/users`: create a new user account
+- `POST /v1/users`: create a new user
 - `POST /v1/users/login`: login with given credentials
-- `GET /v1/users/current`: get user authenticated with JWT token
+- `GET /v1/users/current`: get current user
 
 with cURL:
 
@@ -45,7 +45,7 @@ curl --location --request POST 'localhost:8080/users' \
 }'
 ```
 
-2. Login with created user
+2. Login with given credentials
 ```
 curl --location --request POST 'localhost:8080/users/login' \
 --header 'Content-Type: application/json' \
