@@ -108,7 +108,7 @@ HTTP_SERVER_ADDR=localhost:8080
 ### Unit Tests
 
 ```
-go test -v ./..
+make test
 ```
 
 ### Integration Tests
