@@ -30,19 +30,19 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 service UserService {
   rpc Register(RegistrationRequest) returns (AuthenticationResponse) {
     option (google.api.http) = {
-      post: "/users"
+      post: "/v1/users"
       body: "*"
     };
   }
   rpc Login(LoginRequest) returns (AuthenticationResponse) {
     option (google.api.http) = {
-      post: "/users/login"
+      post: "/v1/users/login"
       body: "*"
     };
   }
   rpc GetCurrent(Empty) returns (UserResponse) {
     option (google.api.http) = {
-      get: "/users/current"
+      get: "/v1/users/current"
     };
   }
 }

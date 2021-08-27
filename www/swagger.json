@@ -24,7 +24,7 @@
     "application/json"
   ],
   "paths": {
-    "/users": {
+    "/v1/users": {
       "post": {
         "operationId": "UserService_Register",
         "responses": {
@@ -56,7 +56,7 @@
         ]
       }
     },
-    "/users/current": {
+    "/v1/users/current": {
       "get": {
         "operationId": "UserService_GetCurrent",
         "responses": {
@@ -78,7 +78,7 @@
         ]
       }
     },
-    "/users/login": {
+    "/v1/users/login": {
       "post": {
         "operationId": "UserService_Login",
         "responses": {

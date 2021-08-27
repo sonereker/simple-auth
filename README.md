@@ -44,7 +44,7 @@ with cURL:
 
 1. Create a new user
 ```
-curl --location --request POST 'localhost:8080/users' \
+curl --location --request POST 'localhost:8080/v1/users' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "email": "dummy@email.com",
@@ -54,7 +54,7 @@ curl --location --request POST 'localhost:8080/users' \
 
 2. Login with given credentials
 ```
-curl --location --request POST 'localhost:8080/users/login' \
+curl --location --request POST 'localhost:8080/v1/users/login' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "email": "dummy@email.com",
@@ -64,7 +64,7 @@ curl --location --request POST 'localhost:8080/users/login' \
 
 3. Get current user
 ```
-curl --location --request GET 'localhost:8080/users/current' \
+curl --location --request GET 'localhost:8080/v1/users/current' \
 --header 'Authorization: <TOKEN_FROM_STEP2>'
 ```
 

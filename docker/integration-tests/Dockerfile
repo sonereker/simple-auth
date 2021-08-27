@@ -11,4 +11,4 @@ COPY ../.. .
 
 RUN go mod download
 
-ENTRYPOINT ["go", "test", "-tags", "integration", "./users", "-v"]
+ENTRYPOINT ["go", "test", "-tags", "integration", "./intenal/users", "-v"]
