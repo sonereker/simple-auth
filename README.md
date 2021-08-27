@@ -114,7 +114,7 @@ There's the `users/service_integration_test.go` test covering the basic function
 database server (see Quick Run) just run test with `tags` flag.
 
 ```
-make test-integation
+make test-integration
 ```
 
 or easier way is just running `integration-test` with docker-compose:
