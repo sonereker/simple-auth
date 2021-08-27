@@ -19,6 +19,9 @@ jobs:
         go-version: 1.16
 
     - name: Build
+      run: go test -race ./...
+
+    - name: Build
       run: make build
 
     - name: Go report card
