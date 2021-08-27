@@ -3,10 +3,9 @@ module github.com/sonereker/simple-auth
 go 1.16
 
 require (
-	github.com/envoyproxy/protoc-gen-validate v0.6.1 // indirect
+	github.com/envoyproxy/protoc-gen-validate v0.6.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/glog v1.0.0 // indirect
-	github.com/googleapis/googleapis v0.0.0-20210826205556-ccb73479aebb // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.5.0
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.7.0 // indirect
