@@ -1,6 +1,16 @@
 version: '3'
 
 services:
+  db:
+    image: 'postgres:13.1-alpine'
+    container_name: db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=local
+      - POSTGRES_PASSWORD=local
+      - POSTGRES_DB=simple_auth
+
   grpc_server:
     build:
       context: .
@@ -54,14 +64,3 @@ services:
       - DB_PORT=5432
       - DB_SSL_MODE=disable
       - GRPC_SERVER_ADDR=grpc_server:8070
-
-  db:
-    image: 'postgres:13.1-alpine'
-    container_name: db
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=local
-      - POSTGRES_PASSWORD=local
-      - POSTGRES_DB=simple_auth
-      - LC_ALL= C.UTF-8

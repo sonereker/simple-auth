@@ -5,6 +5,8 @@ ENV GO111MODULE=on \
     GOOS=linux \
     GOARCH=amd64
 
+RUN apk add --no-cache bash
+
 WORKDIR /build
 
 COPY go.mod .
@@ -19,6 +21,9 @@ WORKDIR /app
 
 RUN cp /build/grpc_server .
 
+COPY docker/wait-for-it.sh .
+RUN chmod +x wait-for-it.sh
+
 EXPOSE 8070
 
-CMD ["/app/grpc_server"]
+ENTRYPOINT ["./wait-for-it.sh","db:5432","--","/app/grpc_server"]
