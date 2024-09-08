@@ -28,7 +28,7 @@ docker-compose build
 docker-compose up
 ```
 
-will build and start these containers;
+to build and start these containers;
 
 - `grpc_server`
 - `http_server`
